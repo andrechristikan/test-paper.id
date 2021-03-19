@@ -23,6 +23,7 @@ class RefreshController extends Controller
 
         return response()->json([
             'status' => 'ok',
+            'message' => 'refresh token success',
             'token' => $token,
             'expires_in' => Auth::guard()->factory()->getTTL() * 60
         ]);

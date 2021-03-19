@@ -20,13 +20,15 @@ class SignUpController extends Controller
 
         if(!Config::get('boilerplate.sign_up.release_token')) {
             return response()->json([
-                'status' => 'ok'
+                'status' => 'ok',
+                'message' => 'signup success',
             ], 201);
         }
 
         $token = $JWTAuth->fromUser($user);
         return response()->json([
             'status' => 'ok',
+            'message' => 'signup success',
             'token' => $token
         ], 201);
     }

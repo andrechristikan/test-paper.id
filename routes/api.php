@@ -17,6 +17,14 @@ $api->version('v1', function (Router $api) {
             $api->get('profile', 'App\\Api\\V1\\Controllers\\UserController@profile');
         });
 
+        $api->group(['prefix' => 'finance-account'], function(Router $api) {
+            $api->get('get', 'App\\Api\\V1\\Controllers\\FinanceAccountController@index');
+            $api->get('show/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@show');
+            $api->get('destroy/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@destroy');
+            $api->get('update/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@update');
+            $api->get('store', 'App\\Api\\V1\\Controllers\\FinanceAccountController@store');
+        });
+
         $api->post('logout', 'App\\Api\\V1\\Controllers\\LogoutController@logout');
         $api->post('refresh', 'App\\Api\\V1\\Controllers\\RefreshController@refresh');
 
