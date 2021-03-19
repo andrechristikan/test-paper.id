@@ -12,22 +12,13 @@ use Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('jwt.auth', []);
-    }
-
+    
     /**
      * Get the authenticated User
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
+    public function profile()
     {
         return response()->json(Auth::guard()->user());
     }
