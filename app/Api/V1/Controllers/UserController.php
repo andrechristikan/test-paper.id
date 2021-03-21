@@ -20,6 +20,10 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return response()->json(Auth::guard()->user());
+        return response()->json([
+            'status_code' => 200,
+            "message" => trans("user.profile"),
+            "data" => Auth::guard()->user()
+        ], 200);
     }
 }

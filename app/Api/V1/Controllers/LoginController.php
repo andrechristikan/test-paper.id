@@ -25,21 +25,20 @@ class LoginController extends Controller
 
         try {
             $token = Auth::guard()->attempt($credentials);
-
             if(!$token) {
-                throw new AccessDeniedHttpException();
+                throw new AccessDeniedHttpException(trans('http.unauthorized'));
             }
 
         } catch (JWTException $e) {
-            throw new HttpException(500);
+            throw new HttpException(trans('http.internal-server-error'));
         }
 
         return response()
             ->json([
-                'status' => 'ok',
-                'message' => 'login success',
+                'status_code' => 200,
+                'message' => trans('login.success'),
                 'token' => $token,
                 'expires_in' => Auth::guard()->factory()->getTTL() * 60
-            ]);
+            ], 200);
     }
 }

@@ -6,131 +6,127 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Api\V1\Requests\FinanceAccountRequest;
 use App\Models\FinanceAccount;
-
+use Auth;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
 class FinanceAccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    
+    public function index(Request $request)
     {
-        $user = Auth::guard()->user();
-        $finance_account = FinanceAccount::where('user_id','=',$user->id)->get();
+        $search = $request->query('search');
+        $sort = $request->query('sort');
+        if($sort && str_contains($sort, '@')){
+            $sort = explode('@', $sort);
 
+            if($sort[1] != 'asc' && $sort[1] != 'desc'){
+                $sort[1] = 'asc';
+            }
+        }
+
+        $finance_account = FinanceAccount::getByUserId();
+        
+        if($search){
+            $finance_account->searchByName($search);
+        }
+
+        if(is_array($sort) && count($sort) > 1){
+            ($sort[1] == 'desc') 
+                ? 
+                $finance_account->orderByDesc($sort[0]) 
+                :
+                $finance_account->orderBy($sort[0]);
+        }
+
+        $finance_account = $finance_account->get();
         return response()
             ->json([
-                'status' => 'ok',
-                'message' => 'get all your finance account',
+                'status_code' => 200,
+                'message' => trans('finance-account.get-all'),
                 'data' => $finance_account
             ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(FinanceAccountRequest $request)
     {
     
+        $user = Auth::guard()->user();
         $request_body = $request->only(['name']);
         $finance_account = new FinanceAccount($request_body);
-        $finance_account->save();
+        $finance_account->user_id = $user->id;
+        if(!$finance_account->save()){
+            throw new HttpException(trans('http.internal-server-error'));
+        }
 
         return response()
             ->json([
-                'status' => 'ok',
-                'message' => 'store your finance account',
+                'status_code' => 201,
+                'message' => trans('finance-account.store'),
                 'data' => [
                     'id' => $finance_account->id
                 ]
-                ], 201);
+            ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function show($id)
     {
-        $finance_account = FinanceAccount::where('id','=',$id)->first();
+        $finance_account = FinanceAccount::getOneByUserIdAndId($id)->first();
         if(!$finance_account){
-            return response()
-                ->json([
-                    'status' => 'error',
-                    'message' => 'your finance account not found',
-                ], 404);
+            throw new NotFoundHttpException(trans('http.not-found'));
         }
 
         return response()
             ->json([
                 'status' => 'ok',
-                'message' => 'show your finance account',
+                'message' => trans('finance-account.get-by-id'),
                 'data' => $finance_account
             ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(FinanceAccountRequest $request, $id)
     {
         $request_body = $request->only(['name']);
-
-        $finance_account = FinanceAccount::where('id','=',$id)->first();
+        $finance_account = FinanceAccount::getOneByUserIdAndId($id)->first();
         if(!$finance_account){
-            return response()
-                ->json([
-                    'status' => 'error',
-                    'message' => 'your finance account not found',
-                ], 404);
+            throw new NotFoundHttpException(trans('http.not-found'));
         }
 
-        $finance_account->name = $request_body->name;
+        $finance_account->name = $request_body['name'];
+        if(!$finance_account->save()){
+            throw new HttpException(trans('http.internal-server-error'));
+        }
 
         return response()
             ->json([
                 'status' => 'ok',
-                'message' => 'update your finance account',
-                'data' => $finance_account
+                'message' => trans('finance-account.update-by-id'),
+                'data' => [
+                    'id' => $finance_account->id
+                ]
             ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function destroy($id)
     {
-        $finance_account = FinanceAccount::where('id','=',$id)->first();
-
+        $finance_account = FinanceAccount::getOneByUserIdAndId($id)->first();
         if(!$finance_account){
-            return response()
-                ->json([
-                    'status' => 'error',
-                    'message' => 'your finance account not found',
-                ], 404);
+            throw new NotFoundHttpException(trans('http.not-found'));
         }
 
-        $finance_account->delete();
+        if(!$finance_account->delete()){
+            throw new HttpException(trans('http.internal-server-error'));
+        }
+
         return response()
             ->json([
                 'status' => 'ok',
-                'message' => 'delete your finance account',
-                'data' => $finance_account
+                'message' => trans('finance-account.destroy-by-id')
             ], 200);
     }
 }
