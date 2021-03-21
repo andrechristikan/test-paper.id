@@ -6,6 +6,8 @@ use Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\FinanceAccount;
+
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -60,5 +62,11 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+
+    public function financeAccount()
+    {
+        return $this->hasMany(FinanceAccount::class, 'user_id', 'id');
     }
 }

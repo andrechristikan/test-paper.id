@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
+use App\Models\TrIncome;
+use App\Models\TrExpense;
+use App\Models\User;
 
 class FinanceAccount extends Model
 {
@@ -32,4 +35,22 @@ class FinanceAccount extends Model
     {
         return $query->getByUserId()->where('id', '=', $id);
     }
+
+
+    public function trIncome()
+    {
+        return $this->hasMany(TrIncome::class, 'finance_account_id', 'id');
+    }
+
+    public function trExpense()
+    {
+        return $this->hasMany(TrExpense::class, 'finance_account_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+
 }
