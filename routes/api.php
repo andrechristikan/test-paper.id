@@ -25,6 +25,10 @@ $api->version('v1', function (Router $api) {
             $api->post('/store', 'App\\Api\\V1\\Controllers\\FinanceAccountController@store');
         });
 
+        $api->group(['prefix' => 'transaction'], function(Router $api) {
+            $api->get('', 'App\\Api\\V1\\Controllers\\TransactionController@index');
+        });
+
         $api->post('/logout', 'App\\Api\\V1\\Controllers\\LogoutController@logout');
         $api->post('/refresh', 'App\\Api\\V1\\Controllers\\RefreshController@refresh');
 

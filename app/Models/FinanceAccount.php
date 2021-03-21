@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Auth;
 use App\Models\TrIncome;
-use App\Models\TrExpense;
+use App\Models\TransactionExpense;
 use App\Models\User;
 
 class FinanceAccount extends Model
@@ -23,10 +23,10 @@ class FinanceAccount extends Model
         return $query->where('user_id','=',$user->id);
     }
 
-    public function scopeSearchByName($query, $name)
+    public function scopeSearch($query, $search)
     {
-        return $query->whereRaw('LOWER(`name`) LIKE ?', [
-            '%'.strtolower($name).'%'
+        return $query->orWhereRaw('LOWER(`name`) LIKE ?', [
+            '%'.strtolower($search).'%'
         ]);
     }
 
@@ -42,9 +42,9 @@ class FinanceAccount extends Model
         return $this->hasMany(TrIncome::class, 'finance_account_id', 'id');
     }
 
-    public function trExpense()
+    public function transactionExpense()
     {
-        return $this->hasMany(TrExpense::class, 'finance_account_id', 'id');
+        return $this->hasMany(TransactionExpense::class, 'finance_account_id', 'id');
     }
 
     public function user()

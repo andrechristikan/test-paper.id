@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\TrExpense;
+use App\Models\TransactionExpense;
 
 class ExpenseCategory extends Model
 {
@@ -13,8 +13,8 @@ class ExpenseCategory extends Model
         'name',
     ];
 
-    public function trExpense()
+    public function transactionExpense()
     {
-        $this->hasMany(TrExpense::class, 'expense_category_id', 'id');
+        $this->hasMany(TransactionExpense::class, 'expense_category_id', 'id');
     }
 }

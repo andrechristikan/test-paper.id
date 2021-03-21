@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class TrExpenseTableSeeder extends Seeder
+class TransactionExpenseTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,7 +11,7 @@ class TrExpenseTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('tr_expense')->insert([
+        DB::table('transaction_expense')->insert([
             'id' => 1,
             'finance_account_id' => 1,
             'expense_category_id' => 1,
@@ -20,7 +20,7 @@ class TrExpenseTableSeeder extends Seeder
             'updated_at' => new DateTime()
         ]);
 
-        DB::table('tr_expense')->insert([
+        DB::table('transaction_expense')->insert([
             'id' => 2,
             'finance_account_id' => 1,
             'expense_category_id' => 1,
@@ -29,7 +29,7 @@ class TrExpenseTableSeeder extends Seeder
             'updated_at' => new DateTime()
         ]);
 
-        DB::table('tr_expense')->insert([
+        DB::table('transaction_expense')->insert([
             'id' => 3,
             'finance_account_id' => 1,
             'expense_category_id' => 1,
@@ -38,7 +38,7 @@ class TrExpenseTableSeeder extends Seeder
             'updated_at' => new DateTime()
         ]);
 
-        DB::table('tr_expense')->insert([
+        DB::table('transaction_expense')->insert([
             'id' => 4,
             'finance_account_id' => 1,
             'expense_category_id' => 2,

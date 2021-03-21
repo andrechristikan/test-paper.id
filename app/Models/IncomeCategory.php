@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\TrIncome;
+use App\Models\TransactionIncome;
 
 class IncomeCategory extends Model
 {
@@ -13,8 +13,8 @@ class IncomeCategory extends Model
         'name',
     ];
 
-    public function trIncome()
+    public function transactionIncome()
     {
-        $this->hasMany(TrIncome::class, 'income_category_id', 'id');
+        $this->hasMany(TransactionIncome::class, 'income_category_id', 'id');
     }
 }

@@ -16,6 +16,10 @@ class FinanceAccountController extends Controller
     
     public function index(Request $request)
     {
+        $page = ( $request->query('page') && is_numeric($request->query('page')) ) ? (int) $request->query('page') : 1;
+        $per_page = ( $request->query('per_page') && is_numeric($request->query('per_page')) ) ? (int) $request->query('per_page') : 10;
+        $off_set= ($page - 1) * $per_page;
+
         $search = $request->query('search');
         $sort = $request->query('sort');
         if($sort && str_contains($sort, '@')){
@@ -29,7 +33,7 @@ class FinanceAccountController extends Controller
         $finance_account = FinanceAccount::getByUserId();
         
         if($search){
-            $finance_account->searchByName($search);
+            $finance_account->search($search);
         }
 
         if(is_array($sort) && count($sort) > 1){
@@ -40,7 +44,7 @@ class FinanceAccountController extends Controller
                 $finance_account->orderBy($sort[0]);
         }
 
-        $finance_account = $finance_account->get();
+        $finance_account = $finance_account->offset($off_set)->limit($per_page)->get();
         return response()
             ->json([
                 'status_code' => 200,
