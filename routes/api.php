@@ -33,6 +33,10 @@ $api->version('v1', function (Router $api) {
             $api->get('/{category_type}/{id}', 'App\\Api\\V1\\Controllers\\TransactionController@show');
         });
 
+        $api->group(['prefix' => 'report'], function(Router $api) {
+            $api->get('', 'App\\Api\\V1\\Controllers\\ReportController@index');
+        });
+
         $api->post('/logout', 'App\\Api\\V1\\Controllers\\LogoutController@logout');
         $api->post('/refresh', 'App\\Api\\V1\\Controllers\\RefreshController@refresh');
 

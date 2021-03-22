@@ -285,7 +285,7 @@ class TransactionController extends Controller
         return response()
             ->json([
                 'status_code' => 200,
-                'message' => trans('transaction.delete'),
+                'message' => trans('transaction.destroy'),
             ], 200);
     }
 }
