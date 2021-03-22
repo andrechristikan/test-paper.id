@@ -19,14 +19,18 @@ $api->version('v1', function (Router $api) {
 
         $api->group(['prefix' => 'finance-account'], function(Router $api) {
             $api->get('', 'App\\Api\\V1\\Controllers\\FinanceAccountController@index');
-            $api->get('/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@show');
             $api->delete('/destroy/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@destroy');
             $api->put('/update/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@update');
             $api->post('/store', 'App\\Api\\V1\\Controllers\\FinanceAccountController@store');
+            $api->get('/{id}', 'App\\Api\\V1\\Controllers\\FinanceAccountController@show');
         });
 
         $api->group(['prefix' => 'transaction'], function(Router $api) {
             $api->get('', 'App\\Api\\V1\\Controllers\\TransactionController@index');
+            $api->post('/store', 'App\\Api\\V1\\Controllers\\TransactionController@store');
+            $api->put('/update/{id}', 'App\\Api\\V1\\Controllers\\TransactionController@update');
+            $api->delete('/destroy/{category_type}/{id}', 'App\\Api\\V1\\Controllers\\TransactionController@destroy');
+            $api->get('/{category_type}/{id}', 'App\\Api\\V1\\Controllers\\TransactionController@show');
         });
 
         $api->post('/logout', 'App\\Api\\V1\\Controllers\\LogoutController@logout');

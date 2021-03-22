@@ -27,7 +27,6 @@ class TransactionExpense extends Model
 
     public function scopeGetByUserId($query)
     {
-        $user = Auth::guard()->user();
         return $query
             ->select(
                 'transaction_expense.finance_account_id as finance_account_id', 
@@ -42,8 +41,7 @@ class TransactionExpense extends Model
             )
             ->selectRaw('\'expense\' as category_type')
             ->joinFinanceAccount()
-            ->joinExpenseCategory()
-            ->where('finance_accounts.user_id','=',$user->id);
+            ->joinExpenseCategory();
     }
 
     public function scopeSearch($query, $search){
@@ -70,12 +68,19 @@ class TransactionExpense extends Model
 
     public function scopeJoinFinanceAccount($query)
     {
-        return $query->join('finance_accounts', 'transaction_expense.finance_account_id', '=', 'finance_accounts.id');
+        $user = Auth::guard()->user();
+        return $query
+            ->where('finance_accounts.user_id','=',$user->id)
+            ->join('finance_accounts', 'transaction_expense.finance_account_id', '=', 'finance_accounts.id');
     }
 
     public function scopeJoinExpenseCategory($query)
     {
         return $query->join('expense_categories', 'transaction_expense.expense_category_id', '=', 'expense_categories.id');
+    }
+
+    public function scopeSumExpense($query){
+        return $query->joinFinanceAccount()->sum('amount');
     }
 
     public function financeAccount()

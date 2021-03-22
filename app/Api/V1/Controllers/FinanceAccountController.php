@@ -99,7 +99,7 @@ class FinanceAccountController extends Controller
         if(!$finance_account){
             throw new NotFoundHttpException(trans('http.not-found'));
         }
-
+        
         $finance_account->name = $request_body['name'];
         if(!$finance_account->save()){
             throw new HttpException(trans('http.internal-server-error'));

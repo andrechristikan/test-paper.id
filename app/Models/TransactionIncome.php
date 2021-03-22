@@ -27,7 +27,6 @@ class TransactionIncome extends Model
 
     public function scopeGetByUserId($query)
     {
-        $user = Auth::guard()->user();
         return $query
             ->select(
                 'transaction_income.finance_account_id as finance_account_id', 
@@ -42,8 +41,7 @@ class TransactionIncome extends Model
             )
             ->selectRaw('\'income\' as category_type')
             ->joinFinanceAccount()
-            ->joinIncomeCategory()
-            ->where('finance_accounts.user_id','=',$user->id);
+            ->joinIncomeCategory();
     }
 
     public function scopeSearch($query, $search){
@@ -68,12 +66,19 @@ class TransactionIncome extends Model
 
     public function scopeJoinFinanceAccount($query)
     {
-        return $query->join('finance_accounts', 'transaction_income.finance_account_id', '=', 'finance_accounts.id');
+        $user = Auth::guard()->user();
+        return $query
+            ->where('finance_accounts.user_id','=',$user->id)
+            ->join('finance_accounts', 'transaction_income.finance_account_id', '=', 'finance_accounts.id');
     }
 
     public function scopeJoinIncomeCategory($query)
     {
         return $query->join('income_categories', 'transaction_income.income_category_id', '=', 'income_categories.id');
+    }
+
+    public function scopeSumIncome($query){
+        return $query->joinFinanceAccount()->sum('amount');
     }
 
     public function financeAccount()

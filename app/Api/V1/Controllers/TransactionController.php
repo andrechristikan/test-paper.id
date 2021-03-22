@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\TransactionIncome;
 use App\Models\TransactionExpense;
+use App\Models\FinanceAccount;
+use App\Models\ExpenseCategory;
+use App\Models\IncomeCategory;
+use App\Api\V1\Requests\TransactionStoreRequest;
+use App\Api\V1\Requests\TransactionUpdateRequest;
+use Auth;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TransactionController extends Controller
 {
@@ -23,6 +31,7 @@ class TransactionController extends Controller
         $search = $request->query('search');
         $sort = $request->query('sort');
         $filters = $request->query('filters');
+        $deleted = $request->query('deleted');
 
         if($sort && str_contains($sort, '@')){
             $sort = explode('@', $sort);
@@ -35,6 +44,14 @@ class TransactionController extends Controller
         $transaction_income = TransactionIncome::getByUserId();
         $transaction_expense = TransactionExpense::getByUserId();
         
+        if($deleted == 'with_trashed'){
+            $transaction_income->withTrashed();
+            $transaction_expense->withTrashed();
+        }else if($deleted == 'only_trashed'){
+            $transaction_income->onlyTrashed();
+            $transaction_expense->onlyTrashed();
+        }
+
         if($search){
             $transaction_income->search($search);
             $transaction_expense->search($search);
@@ -104,24 +121,61 @@ class TransactionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TransactionStoreRequest $request)
     {
-        //
+        $request_body = $request->only([
+            'finance_account_id',
+            'category_id',
+            'category_type',
+            'amount'
+        ]);
+
+        $finance_account = FinanceAccount::find($request_body['finance_account_id']);
+        if(!$finance_account){
+            throw new NotFoundHttpException(trans('transaction.finance-account-not-found'));
+        }
+
+        if($request_body['category_type'] == 'expense'){
+            $category = ExpenseCategory::find($request_body['category_id']);
+        }else{
+            $category = IncomeCategory::find($request_body['category_id']);
+        }
+
+        if(!$category){
+            throw new NotFoundHttpException(trans('transaction.category-not-found'));
+        }
+
+        if($request_body['category_type'] == 'expense'){
+            $transaction = new TransactionExpense([
+                "finance_account_id" => $request_body['finance_account_id'],
+                "expense_category_id" => $request_body['category_id'],
+                "amount" => $request_body['amount']
+            ]);
+        }else{
+            $transaction = new TransactionIncome([
+                "finance_account_id" => $request_body['finance_account_id'],
+                "income_category_id" => $request_body['category_id'],
+                "amount" => $request_body['amount']
+            ]);
+        }
+
+        if(!$transaction->save()){
+            throw new HttpException(trans('http.internal-server-error'));
+        }
+
+        return response()
+            ->json([
+                'status_code' => 201,
+                'message' => trans('transaction.store'),
+                'data' => [
+                    "id" => $transaction->id
+                ]
+            ], 201);
     }
 
     /**
@@ -130,20 +184,24 @@ class TransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($category_type, $id)
     {
-        //
-    }
+        if($category_type == 'expense'){
+            $transaction = TransactionExpense::getByUserId()->find($id);
+        }else{
+            $transaction = TransactionIncome::getByUserId()->find($id);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if(!$transaction){
+            throw new NotFoundHttpException(trans('http.not-found'));
+        }
+        
+        return response()
+            ->json([
+                'status_code' => 200,
+                'message' => trans('transaction.show'),
+                'data' => $transaction
+            ], 200);
     }
 
     /**
@@ -153,9 +211,47 @@ class TransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(TransactionUpdateRequest $request, $id)
     {
-        //
+        $request_body = $request->only([
+            'category_id',
+            'category_type',
+            'amount'
+        ]);
+
+        if($request_body['category_type'] == 'expense'){
+            $transaction = TransactionExpense::getByUserId()->find($id);
+        }else{
+            $transaction = TransactionIncome::getByUserId()->find($id);
+        }
+
+        if(!$transaction){
+            throw new NotFoundHttpException(trans('http.not-found'));
+        }
+
+        if($request_body['category_type'] == 'expense'){
+            $transaction = TransactionExpense::find($id);
+            $transaction->expense_category_id =  $request_body['category_id'];
+            $transaction->amount =  $request_body['amount'];
+        }else{
+            $transaction = TransactionIncome::find($id);
+            $transaction->income_category_id =  $request_body['category_id'];
+            $transaction->amount =  $request_body['amount'];
+        }
+
+        if(!$transaction->save()){
+            throw new HttpException(trans('http.internal-server-error'));
+        }
+
+        
+        return response()
+            ->json([
+                'status_code' => 200,
+                'message' => trans('transaction.update'),
+                'data' => [
+                    "id" => $transaction->id
+                ]
+            ], 200);
     }
 
     /**
@@ -164,8 +260,32 @@ class TransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($category_type, $id)
     {
-        //
+        if($category_type == 'expense'){
+            $transaction = TransactionExpense::getByUserId()->find($id);
+        }else{
+            $transaction = TransactionIncome::getByUserId()->find($id);
+        }
+
+        if(!$transaction){
+            throw new NotFoundHttpException(trans('http.not-found'));
+        }
+
+        if($category_type == 'expense'){
+            $transaction = TransactionExpense::find($id);
+        }else{
+            $transaction = TransactionIncome::find($id);
+        }
+        
+        if(!$transaction->delete()){
+            throw new HttpException(trans('http.internal-server-error'));
+        }
+
+        return response()
+            ->json([
+                'status_code' => 200,
+                'message' => trans('transaction.delete'),
+            ], 200);
     }
 }

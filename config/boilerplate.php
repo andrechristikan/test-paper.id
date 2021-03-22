@@ -28,4 +28,23 @@ return [
         ]
     ],
 
+    'transaction-store' => [
+
+        'validation_rules' => [
+            'finance_account_id' => 'required|integer',
+            'category_id' => 'required|integer',
+            'category_type' => 'required|string',
+            'amount' => 'required|integer',
+        ]
+    ],
+    
+    'transaction-update' => [
+
+        'validation_rules' => [
+            'category_id' => 'required|integer',
+            'category_type' => 'required|string',
+            'amount' => 'required|integer',
+        ]
+    ],
+
 ];
