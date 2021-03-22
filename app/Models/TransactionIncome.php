@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\FinanceAccount;
 use App\Models\IncomeCategory;
 use Auth;
+use DateTime;
 
 
 class TransactionIncome extends Model
@@ -44,6 +45,17 @@ class TransactionIncome extends Model
             ->joinIncomeCategory();
     }
 
+    public function scopeGetByMonthAndYear($query, $year, $month){
+        return $query
+            ->whereYear('transaction_income.created_at', '=', $year)
+            ->whereMonth('transaction_income.created_at', '=', $month);
+    }
+
+    public function scopeGetByDate($query, $year, $month, $day){
+        $date = new DateTime($day.'-'.$month.'-'.$year);
+        return $query->whereDate('transaction_income.created_at', '=', $date);
+    }
+
     public function scopeSearch($query, $search){
         return $query->whereRaw('LOWER(`finance_accounts`.`name`) LIKE ?', [
                 '%'.strtolower($search).'%'
@@ -78,8 +90,9 @@ class TransactionIncome extends Model
     }
 
     public function scopeSumIncome($query){
-        return $query->joinFinanceAccount()->sum('amount');
+        return $query->joinFinanceAccount()->sum('transaction_income.amount');
     }
+    
 
     public function financeAccount()
     {

@@ -14,6 +14,7 @@ use App\Api\V1\Requests\TransactionUpdateRequest;
 use Auth;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TransactionController extends Controller
 {

@@ -7,7 +7,7 @@ use App\Models\TransactionExpense;
 
 class ExpenseCategory extends Model
 {
-    protected $table = 'expense_category';
+    protected $table = 'expense_categories';
 
     protected $fillable = [
         'name',

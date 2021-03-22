@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\FinanceAccount;
 use App\Models\ExpenseCategory;
 use Auth;
+use DateTime;
 
 class TransactionExpense extends Model
 {
@@ -42,6 +43,17 @@ class TransactionExpense extends Model
             ->selectRaw('\'expense\' as category_type')
             ->joinFinanceAccount()
             ->joinExpenseCategory();
+    }
+
+    public function scopeGetByMonthAndYear($query, $year, $month){
+        return $query
+            ->whereYear('transaction_expense.created_at', '=', $year)
+            ->whereMonth('transaction_expense.created_at', '=', $month);
+    }
+
+    public function scopeGetByDate($query, $year, $month, $day){
+        $date = new DateTime($day.'-'.$month.'-'.$year);
+        return $query->whereDate('transaction_expense.created_at', '=', $date);
     }
 
     public function scopeSearch($query, $search){

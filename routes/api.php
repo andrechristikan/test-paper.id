@@ -34,7 +34,8 @@ $api->version('v1', function (Router $api) {
         });
 
         $api->group(['prefix' => 'report'], function(Router $api) {
-            $api->get('', 'App\\Api\\V1\\Controllers\\ReportController@index');
+            $api->get('/{year}/{month}', 'App\\Api\\V1\\Controllers\\ReportController@monthly');
+            $api->get('/{year}/{month}/{date}/', 'App\\Api\\V1\\Controllers\\ReportController@daily');
         });
 
         $api->post('/logout', 'App\\Api\\V1\\Controllers\\LogoutController@logout');

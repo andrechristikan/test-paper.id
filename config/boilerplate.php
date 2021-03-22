@@ -33,7 +33,7 @@ return [
         'validation_rules' => [
             'finance_account_id' => 'required|integer',
             'category_id' => 'required|integer',
-            'category_type' => 'required|string',
+            'category_type' => 'required|string|in:expense,income',
             'amount' => 'required|integer',
         ]
     ],
@@ -42,7 +42,7 @@ return [
 
         'validation_rules' => [
             'category_id' => 'required|integer',
-            'category_type' => 'required|string',
+            'category_type' => 'required|string|in:expense,income',
             'amount' => 'required|integer',
         ]
     ],
