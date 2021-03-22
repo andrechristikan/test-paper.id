@@ -28,5 +28,13 @@ class FinanceAccountsTableSeeder extends Seeder
             'updated_at' => new DateTime()
         ]);
 
+        DB::table('finance_accounts')->insert([
+            'id' => 3,
+            'user_id' => 2,
+            'name' => 'bank',
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime()
+        ]);
+
     }
 }

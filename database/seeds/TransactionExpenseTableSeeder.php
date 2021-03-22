@@ -46,5 +46,32 @@ class TransactionExpenseTableSeeder extends Seeder
             'created_at' => new DateTime(),
             'updated_at' => new DateTime()
         ]);
+
+        DB::table('transaction_expense')->insert([
+            'id' => 5,
+            'finance_account_id' => 3,
+            'expense_category_id' => 2,
+            'amount' => 25000,
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime()
+        ]);
+
+        DB::table('transaction_expense')->insert([
+            'id' => 6,
+            'finance_account_id' => 3,
+            'expense_category_id' => 2,
+            'amount' => 50000,
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime()
+        ]);
+
+        DB::table('transaction_expense')->insert([
+            'id' => 7,
+            'finance_account_id' => 3,
+            'expense_category_id' => 2,
+            'amount' => 15000,
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime()
+        ]);
     }
 }
