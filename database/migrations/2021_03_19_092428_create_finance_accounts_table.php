@@ -16,7 +16,7 @@ class CreateFinanceAccountsTable extends Migration
         Schema::create('finance_accounts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
-            $table->string('name')->unique();
+            $table->string('name');
 
             $table->foreign('user_id')
                 ->references('id')
