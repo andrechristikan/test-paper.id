@@ -30,7 +30,9 @@ class SignUpController extends Controller
         return response()->json([
             'status_code' => 201,
             'message' => trans('sign-up.success'),
-            'token' => $token
+            'data' => [
+                'token' => $token
+            ]
         ], 201);
     }
 }
