@@ -66,6 +66,9 @@ class TransactionController extends Controller
 
         $transaction = $transaction_expense->unionAll($transaction_income);
 
+        $count = $transaction->count();
+        $total_page = floor($count / $per_page) ?: 1;
+
         if(is_array($sort) && count($sort) > 1){
             ($sort[1] == 'desc') 
                 ? 
@@ -81,6 +84,10 @@ class TransactionController extends Controller
             ->json([
                 'status_code' => 200,
                 'message' => trans('transaction.get-all'),
+                'page'=> $page,
+                'per_page'=> $per_page,
+                'total_page'=> $total_page,
+                'count'=> $count,
                 'data' => $transaction,
             ], 200);
     }

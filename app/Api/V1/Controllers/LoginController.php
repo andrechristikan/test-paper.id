@@ -37,8 +37,10 @@ class LoginController extends Controller
             ->json([
                 'status_code' => 200,
                 'message' => trans('login.success'),
-                'token' => $token,
-                'expires_in' => Auth::guard()->factory()->getTTL() * 60
+                'data' => [
+                    'token' => $token,
+                    'expires_in' => Auth::guard()->factory()->getTTL() * 60
+                ]
             ], 200);
     }
 }

@@ -20,6 +20,7 @@ class FinanceAccountController extends Controller
         $per_page = ( $request->query('per_page') && is_numeric($request->query('per_page')) ) ? (int) $request->query('per_page') : 10;
         $off_set= ($page - 1) * $per_page;
 
+
         $search = $request->query('search');
         $sort = $request->query('sort');
         if($sort && str_contains($sort, '@')){
@@ -36,6 +37,9 @@ class FinanceAccountController extends Controller
             $finance_account->search($search);
         }
 
+        $count = $finance_account->count();
+        $total_page = floor($count / $per_page) ?: 1;
+
         if(is_array($sort) && count($sort) > 1){
             ($sort[1] == 'desc') 
                 ? 
@@ -49,6 +53,10 @@ class FinanceAccountController extends Controller
             ->json([
                 'status_code' => 200,
                 'message' => trans('finance-account.get-all'),
+                'page'=> $page,
+                'per_page'=> $per_page,
+                'total_page'=> $total_page,
+                'count'=> $count,
                 'data' => $finance_account
             ], 200);
     }

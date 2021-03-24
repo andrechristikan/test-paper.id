@@ -25,7 +25,7 @@ class FinanceAccount extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->orWhereRaw('LOWER(`name`) LIKE ?', [
+        return $query->whereRaw('LOWER(`name`) LIKE ?', [
             '%'.strtolower($search).'%'
         ]);
     }
